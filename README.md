@@ -1,4 +1,4 @@
-# PebbleGPT - AI-Powered Voice Assistant for Pebble Time
+# PebbleAI - AI-Powered Voice Assistant for Pebble Time
 
 This project provides an AI-powered voice assistant for the Pebble Time watch. The assistant listens for your voice input, sends the transcriptions to either OpenAI's GPT, Anthropic's Claude, or Google's Gemini API, and displays the AI's response on the watch.
 
