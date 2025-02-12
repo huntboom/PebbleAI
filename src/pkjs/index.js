@@ -155,11 +155,18 @@ var clayConfig = [
 var clay = new Clay(clayConfig);
 
 function getConfig() {
+<<<<<<< HEAD
   return JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+=======
+  var config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+  console.log("Current config:", JSON.stringify(config));
+  return config;
+>>>>>>> temp-branch
 }
 
 function makeApiRequest(prompt, onResponse, onError) {
   var config = getConfig();
+<<<<<<< HEAD
   
   if (config[API_PROVIDER] === "openai") {
     makeOpenAIRequest(prompt, onResponse, onError);
@@ -168,11 +175,45 @@ function makeApiRequest(prompt, onResponse, onError) {
   } else if (config[API_PROVIDER] === "gemini") {
     makeGeminiRequest(prompt, onResponse, onError);
   } else {
+=======
+  console.log("Making API request with provider:", config[API_PROVIDER]);
+  
+  if (config[API_PROVIDER] === "openai") {
+    console.log("OpenAI selected, checking API key...");
+    if (!config.apiKey) {
+      console.log("OpenAI API key not found");
+      onError("OpenAI API key not set");
+      return;
+    }
+    console.log("OpenAI API key found, making request");
+    makeOpenAIRequest(prompt, onResponse, onError);
+  } else if (config[API_PROVIDER] === "claude") {
+    console.log("Claude selected, checking API key...");
+    if (!config.claudeApiKey) {
+      console.log("Claude API key not found");
+      onError("Claude API key not set");
+      return;
+    }
+    console.log("Claude API key found, making request");
+    makeClaudeRequest(prompt, onResponse, onError);
+  } else if (config[API_PROVIDER] === "gemini") {
+    console.log("Gemini selected, checking API key...");
+    if (!config.geminiApiKey) {
+      console.log("Gemini API key not found");
+      onError("Gemini API key not set");
+      return;
+    }
+    console.log("Gemini API key found, making request");
+    makeGeminiRequest(prompt, onResponse, onError);
+  } else {
+    console.log("Invalid provider:", config[API_PROVIDER]);
+>>>>>>> temp-branch
     onError("Invalid API provider");
   }
 }
 
 function makeOpenAIRequest(prompt, onResponse, onError) {
+<<<<<<< HEAD
   var config = getConfig();
 
   if (!config[API_KEY]) {
@@ -180,16 +221,31 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
     return;
   }
 
+=======
+  console.log("Starting OpenAI request");
+  var config = getConfig();
+
+>>>>>>> temp-branch
   var method = "POST";
   var url = "https://api.openai.com/v1/chat/completions";
 
   var request = new XMLHttpRequest();
 
   request.onload = function () {
+<<<<<<< HEAD
     try {
       var responseBody = JSON.parse(this.responseText);
 
       if (responseBody.error) {
+=======
+    console.log("OpenAI response received, status:", this.status);
+    try {
+      var responseBody = JSON.parse(this.responseText);
+      console.log("OpenAI response parsed:", JSON.stringify(responseBody));
+
+      if (responseBody.error) {
+        console.log("OpenAI error:", responseBody.error.message);
+>>>>>>> temp-branch
         onError(responseBody.error.message);
         return;
       }
@@ -198,11 +254,17 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
       messages.push({ role: "assistant", content: chatCompletion });
       onResponse(chatCompletion);
     } catch (e) {
+<<<<<<< HEAD
       onError("Failed to parse response");
+=======
+      console.log("Failed to parse OpenAI response:", e.message);
+      onError("Failed to parse response: " + e.message);
+>>>>>>> temp-branch
     }
   };
 
   request.onerror = function() {
+<<<<<<< HEAD
     onError("Network error");
   };
 
@@ -212,16 +274,39 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
 
   if (messages.length === 0 && config[SYSTEM_PROMPT]) {
     messages.push({ role: "system", content: config[SYSTEM_PROMPT] });
+=======
+    console.log("Network error in OpenAI request");
+    onError("Network error");
+  };
+
+  console.log("Opening request to OpenAI");
+  request.open(method, url);
+  request.setRequestHeader("Content-Type", "application/json");
+  request.setRequestHeader("Authorization", "Bearer " + config.apiKey);
+
+  if (messages.length === 0 && config.systemPrompt) {
+    console.log("Adding system prompt");
+    messages.push({ role: "system", content: config.systemPrompt });
+>>>>>>> temp-branch
   }
 
   messages.push({ role: "user", content: prompt });
 
   var requestBody = JSON.stringify({
+<<<<<<< HEAD
     model: config[MODEL] || "gpt-3.5-turbo",
     messages: messages,
     temperature: config[TEMPERATURE] || 1,
   });
 
+=======
+    model: config.model || "gpt-3.5-turbo",
+    messages: messages,
+    temperature: config.temperature || 1,
+  });
+  
+  console.log("Sending request to OpenAI");
+>>>>>>> temp-branch
   request.send(requestBody);
 }
 
@@ -354,6 +439,7 @@ Pebble.addEventListener("ready", function (e) {
 
 Pebble.addEventListener("webviewclosed", function (e) {
   if (e && !e.response) {
+<<<<<<< HEAD
     return;
   }
 
@@ -364,18 +450,56 @@ Pebble.addEventListener("webviewclosed", function (e) {
   }, {});
 
   localStorage.setItem(CONFIG_KEY, JSON.stringify(configValues));
+=======
+    console.log("Webview closed without response");
+    return;
+  }
+
+  console.log("Raw webview response:", e.response);
+  var configData = clay.getSettings(e.response);
+  console.log("Clay settings:", JSON.stringify(configData));
+  
+  // Create a mapping of numeric keys to string keys
+  var keyMapping = {
+    "3": "apiKey",
+    "4": "model",
+    "5": "systemPrompt",
+    "6": "temperature",
+    "7": "vibrate",
+    "8": "apiProvider",
+    "9": "claudeApiKey",
+    "10": "geminiApiKey",
+    "11": "confirmTranscription",
+    "12": "invertColors"
+  };
+  
+  var configValues = {};
+  Object.keys(configData).forEach(function(key) {
+    var mappedKey = keyMapping[key] || key;
+    configValues[mappedKey] = configData[key];
+  });
+
+  console.log("Saving config:", JSON.stringify(configValues));
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(configValues));
+  console.log("Config saved successfully");
+>>>>>>> temp-branch
 });
 
 Pebble.addEventListener("appmessage", function (e) {
+  console.log("Received app message:", JSON.stringify(e.payload));
+  
   function onError(errorText) {
+    console.log("Error occurred:", errorText);
     Pebble.sendAppMessage({ AppKeyResponse: "Error: " + errorText });
   }
 
   function onResponse(responseText) {
+    console.log("Received API response");
     Pebble.sendAppMessage({ AppKeyResponse: responseText });
   }
 
   if (e.payload.AppKeyTranscription) {
+    console.log("Received transcription:", e.payload.AppKeyTranscription);
     makeApiRequest(e.payload.AppKeyTranscription, onResponse, onError);
   }
 });
