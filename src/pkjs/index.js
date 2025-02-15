@@ -125,6 +125,10 @@ var clayConfig = [
         min: 0,
         max: 2,
         step: 0.1,
+        attributes: {
+          precision: 1,
+          type: 'number'
+        }
       },
       {
         type: 'toggle',
@@ -244,14 +248,17 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
 
   messages.push({ role: "user", content: prompt });
 
-  var requestBody = JSON.stringify({
+  var requestBody = {
     model: config.model || "gpt-3.5-turbo",
     messages: messages,
-    temperature: config.temperature || 1,
-  });
-  
-  console.log("Sending request to OpenAI");
-  request.send(requestBody);
+    temperature: parseFloat(config.temperature) || 1,
+  };
+
+  console.log("Temperature value:", config.temperature);
+  console.log("Parsed temperature:", parseFloat(config.temperature));
+  console.log("Final request body:", JSON.stringify(requestBody));
+
+  request.send(JSON.stringify(requestBody));
 }
 
 function makeClaudeRequest(prompt, onResponse, onError) {
@@ -408,7 +415,12 @@ Pebble.addEventListener("webviewclosed", function (e) {
   var configValues = {};
   Object.keys(configData).forEach(function(key) {
     var mappedKey = keyMapping[key] || key;
-    configValues[mappedKey] = configData[key];
+    // Special handling for temperature
+    if (mappedKey === 'temperature') {
+      configValues[mappedKey] = parseFloat(configData[key]) / 10;
+    } else {
+      configValues[mappedKey] = configData[key];
+    }
   });
 
   console.log("Saving config:", JSON.stringify(configValues));
