@@ -27,7 +27,8 @@
       "claudeApiKey": 9,
       "geminiApiKey": 10,
       "confirmTranscription": 11,
-      "invertColors": 12
+      "invertColors": 12,
+      "deepseekApiKey": 13
     },
     "configurable":true, 
     "enableMultiJS": true,

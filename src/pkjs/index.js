@@ -42,6 +42,10 @@ var clayConfig = [
         label: "Gemini",
         value: "gemini",
       },
+      {
+        label: "DeepSeek",
+        value: "deepseek",
+      },
     ],
   },
   {
@@ -83,6 +87,20 @@ var clayConfig = [
         type: "input",
         messageKey: "geminiApiKey",
         label: "Gemini API key",
+      },
+    ],
+  },
+  {
+    type: "section",
+    items: [
+      {
+        type: "heading",
+        defaultValue: "Required for DeepSeek",
+      },
+      {
+        type: "input",
+        messageKey: "deepseekApiKey",
+        label: "DeepSeek API key",
       },
     ],
   },
@@ -195,6 +213,15 @@ function makeApiRequest(prompt, onResponse, onError) {
     }
     console.log("Gemini API key found, making request");
     makeGeminiRequest(prompt, onResponse, onError);
+  } else if (config[API_PROVIDER] === "deepseek") {
+    console.log("DeepSeek selected, checking API key...");
+    if (!config.deepseekApiKey) {
+      console.log("DeepSeek API key not found");
+      onError("DeepSeek API key not set");
+      return;
+    }
+    console.log("DeepSeek API key found, making request");
+    makeDeepSeekRequest(prompt, onResponse, onError);
   } else {
     console.log("Invalid provider:", config[API_PROVIDER]);
     onError("Invalid API provider");
@@ -377,6 +404,56 @@ function makeGeminiRequest(prompt, onResponse, onError) {
   request.send(requestBody);
 }
 
+function makeDeepSeekRequest(prompt, onResponse, onError) {
+  var config = getConfig();
+
+  var request = new XMLHttpRequest();
+  var url = "https://api.deepseek.com/chat/completions";
+
+  request.onload = function () {
+    if (this.status >= 200 && this.status < 300) {
+      try {
+        var responseBody = JSON.parse(this.responseText);
+        var chatCompletion = responseBody.choices[0].message.content;
+        messages.push({ role: "assistant", content: chatCompletion });
+        onResponse(chatCompletion);
+      } catch (e) {
+        onError("Failed to parse response");
+      }
+    } else {
+      try {
+        var errorBody = JSON.parse(this.responseText);
+        onError(errorBody.error ? errorBody.error.message : "Unknown error");
+      } catch (e) {
+        onError("Failed to parse error response");
+      }
+    }
+  };
+
+  request.onerror = function () {
+    onError("Network error");
+  };
+
+  request.open("POST", url);
+  request.setRequestHeader("Content-Type", "application/json");
+  request.setRequestHeader("Authorization", "Bearer " + config.deepseekApiKey);
+
+  if (messages.length === 0 && config.systemPrompt) {
+    messages.push({ role: "system", content: config.systemPrompt });
+  }
+
+  messages.push({ role: "user", content: prompt });
+
+  var requestBody = {
+    model: "deepseek-chat",
+    messages: messages,
+    temperature: parseFloat(config.temperature) || 1,
+    stream: false
+  };
+
+  request.send(JSON.stringify(requestBody));
+}
+
 function resetMessages() {
   messages = [];
 }
@@ -409,7 +486,8 @@ Pebble.addEventListener("webviewclosed", function (e) {
     "9": "claudeApiKey",
     "10": "geminiApiKey",
     "11": "confirmTranscription",
-    "12": "invertColors"
+    "12": "invertColors",
+    "13": "deepseekApiKey"
   };
   
   var configValues = {};
