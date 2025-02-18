@@ -15,14 +15,26 @@ var messages = [];
 var clayConfig = [
   {
     type: "heading",
-    defaultValue: "PebbleGPT Configuration",
+    defaultValue: "PebbleAI Configuration",
   },
   {
     type: "text",
     defaultValue:
-      "To use ChatGPT you will need " +
-      "your <a href='https://platform.openai.com/account/api-keys'>own OpenAI API key</a> and " +
-      "<a href='https://help.rebble.io/setup-subscription/#1'>a Rebble subscription</a> (for voice transcription).",
+      "To use PebbleAI you will need to provide your own API keys for the providers you want to use. " +
+      "<br><br>" +
+      "Please note that many API providers require users to add credits to their account before the API becomes usable. " +
+      "Free tiers and credit availability vary by provider. " +
+      "<br><br>" +
+      "Voice dictation requires an active Rebble subscription. " +
+      "You can subscribe at <a href='https://auth.rebble.io/account/'>auth.rebble.io</a>." +
+      "<br><br>" +
+      "You can get your API keys from the following links:" +
+      "<ul>" +
+      "<li><a href='https://platform.openai.com/account/api-keys'>OpenAI</a></li>" +
+      "<li><a href='https://console.anthropic.com/settings/keys'>Claude</a></li>" +
+      "<li><a href='https://aistudio.google.com/apikey'>Gemini</a></li>" +
+      "<li><a href='https://platform.deepseek.com/api_keys'>DeepSeek</a></li>" +
+      "</ul>",
   },
   {
     type: "select",
@@ -114,7 +126,7 @@ var clayConfig = [
       {
         type: "input",
         messageKey: "systemPrompt",
-        label: "System prompt",
+        label: "System prompt (for OpenAI)",
         description:
           "Any context for your queries – something about yourself, or how you want GPT to respond. For example: <em>Respond with one sentence.</em>",
       },
@@ -138,7 +150,7 @@ var clayConfig = [
         type: "slider",
         messageKey: "temperature",
         defaultValue: 1,
-        label: "Temperature",
+        label: "Temperature (for OpenAI)",
         description: "How creative the responses should be.",
         min: 0,
         max: 2,
