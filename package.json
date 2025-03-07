@@ -28,7 +28,8 @@
       "geminiApiKey": 10,
       "confirmTranscription": 11,
       "invertColors": 12,
-      "deepseekApiKey": 13
+      "deepseekApiKey": 13,
+      "showModelName": 14
     },
     "configurable":true, 
     "enableMultiJS": true,

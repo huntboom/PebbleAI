@@ -177,6 +177,12 @@ var clayConfig = [
         messageKey: 'invertColors',
         label: 'Invert colors',
         defaultValue: false
+      },
+      {
+        type: 'toggle',
+        messageKey: 'showModelName',
+        label: 'Display Model Name at start of messages',
+        defaultValue: false
       }
     ],
   },
@@ -263,6 +269,12 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
 
       var chatCompletion = responseBody.choices[0].message.content;
       messages.push({ role: "assistant", content: chatCompletion });
+      
+      // Add model name prefix if enabled
+      if (config.showModelName) {
+        chatCompletion = "OpenAI: " + chatCompletion;
+      }
+      
       onResponse(chatCompletion);
     } catch (e) {
       console.log("Failed to parse OpenAI response:", e.message);
@@ -317,6 +329,12 @@ function makeClaudeRequest(prompt, onResponse, onError) {
         var responseBody = JSON.parse(this.responseText);
         var chatCompletion = responseBody.content[0].text;
         messages.push({ role: "assistant", content: chatCompletion });
+        
+        // Add model name prefix if enabled
+        if (config.showModelName) {
+          chatCompletion = "Claude: " + chatCompletion;
+        }
+        
         onResponse(chatCompletion);
       } catch (e) {
         onError("Failed to parse response");
@@ -374,6 +392,12 @@ function makeGeminiRequest(prompt, onResponse, onError) {
         var responseBody = JSON.parse(this.responseText);
         var chatCompletion = responseBody.candidates[0].content.parts[0].text;
         messages.push({ role: "model", content: chatCompletion });
+        
+        // Add model name prefix if enabled
+        if (config.showModelName) {
+          chatCompletion = "Gemini: " + chatCompletion;
+        }
+        
         onResponse(chatCompletion);
       } catch (e) {
         onError("Failed to parse response");
@@ -428,6 +452,12 @@ function makeDeepSeekRequest(prompt, onResponse, onError) {
         var responseBody = JSON.parse(this.responseText);
         var chatCompletion = responseBody.choices[0].message.content;
         messages.push({ role: "assistant", content: chatCompletion });
+        
+        // Add model name prefix if enabled
+        if (config.showModelName) {
+          chatCompletion = "DeepSeek: " + chatCompletion;
+        }
+        
         onResponse(chatCompletion);
       } catch (e) {
         onError("Failed to parse response");
@@ -499,7 +529,8 @@ Pebble.addEventListener("webviewclosed", function (e) {
     "10": "geminiApiKey",
     "11": "confirmTranscription",
     "12": "invertColors",
-    "13": "deepseekApiKey"
+    "13": "deepseekApiKey",
+    "14": "showModelName"
   };
   
   var configValues = {};

@@ -9,7 +9,8 @@ static Settings settings = {
   .claudeApiKeySet = false,
   .geminiApiKeySet = false,
   .confirmTranscription = false,
-  .invertColors = false
+  .invertColors = false,
+  .showModelName = false
 };
 
 void on_settings_received(DictionaryIterator *iter) {
@@ -48,6 +49,11 @@ void on_settings_received(DictionaryIterator *iter) {
   Tuple *invert_colors_tuple = dict_find(iter, AppKeyInvertColors);
   if (invert_colors_tuple) {
     settings.invertColors = (invert_colors_tuple->value->int32 == 1);
+  }
+  
+  Tuple *show_model_name_tuple = dict_find(iter, AppKeyShowModelName);
+  if (show_model_name_tuple) {
+    settings.showModelName = (show_model_name_tuple->value->int32 == 1);
   }
  
   persist_write_data(SETTINGS_KEY, &settings, sizeof(settings));

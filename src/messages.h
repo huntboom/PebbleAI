@@ -9,7 +9,9 @@ typedef enum {
   AppKeyClaudeApiKey = 9,
   AppKeyGeminiApiKey = 10,
   AppKeyConfirmTranscription = 11,
-  AppKeyInvertColors = 12
+  AppKeyInvertColors = 12,
+  AppKeyDeepseekApiKey = 13,
+  AppKeyShowModelName = 14
 } AppKey;
 #endif
 

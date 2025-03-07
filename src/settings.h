@@ -11,6 +11,7 @@ typedef struct Settings {
   bool geminiApiKeySet; 
   bool confirmTranscription;
   bool invertColors;
+  bool showModelName;
 } Settings;
 
 void on_settings_received(DictionaryIterator *iter);
