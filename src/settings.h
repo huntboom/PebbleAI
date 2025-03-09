@@ -1,17 +1,22 @@
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
 #include <pebble.h>
 
 // Persistent storage key
 #define SETTINGS_KEY 1
 
-typedef struct Settings {
+typedef struct {
   bool vibrate;
   bool apiKeySet;
   char apiProvider[10];
   bool claudeApiKeySet;
-  bool geminiApiKeySet; 
+  bool geminiApiKeySet;
   bool confirmTranscription;
   bool invertColors;
+  bool deepseekApiKeySet;
   bool showModelName;
+  bool grokApiKeySet;
 } Settings;
 
 void on_settings_received(DictionaryIterator *iter);
@@ -20,3 +25,5 @@ void init_settings();
 
 Settings get_settings();
 void save_settings(Settings new_settings);
+
+#endif

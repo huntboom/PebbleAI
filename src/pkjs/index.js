@@ -34,6 +34,7 @@ var clayConfig = [
       "<li><a href='https://console.anthropic.com/settings/keys'>Claude</a></li>" +
       "<li><a href='https://aistudio.google.com/apikey'>Gemini</a></li>" +
       "<li><a href='https://platform.deepseek.com/api_keys'>DeepSeek</a></li>" +
+      "<li><a href='https://platform.x.ai/'>Grok</a></li>" +
       "</ul>",
   },
   {
@@ -57,6 +58,10 @@ var clayConfig = [
       {
         label: "DeepSeek",
         value: "deepseek",
+      },
+      {
+        label: "Grok",
+        value: "grok",
       },
     ],
   },
@@ -113,6 +118,20 @@ var clayConfig = [
         type: "input",
         messageKey: "deepseekApiKey",
         label: "DeepSeek API key",
+      },
+    ],
+  },
+  {
+    type: "section",
+    items: [
+      {
+        type: "heading",
+        defaultValue: "Required for Grok",
+      },
+      {
+        type: "input",
+        messageKey: "grokApiKey",
+        label: "Grok API key",
       },
     ],
   },
@@ -240,6 +259,15 @@ function makeApiRequest(prompt, onResponse, onError) {
     }
     console.log("DeepSeek API key found, making request");
     makeDeepSeekRequest(prompt, onResponse, onError);
+  } else if (config[API_PROVIDER] === "grok") {
+    console.log("Grok selected, checking API key...");
+    if (!config.grokApiKey) {
+      console.log("Grok API key not found");
+      onError("Grok API key not set");
+      return;
+    }
+    console.log("Grok API key found, making request");
+    makeGrokRequest(prompt, onResponse, onError);
   } else {
     console.log("Invalid provider:", config[API_PROVIDER]);
     onError("Invalid API provider");
@@ -496,6 +524,61 @@ function makeDeepSeekRequest(prompt, onResponse, onError) {
   request.send(JSON.stringify(requestBody));
 }
 
+function makeGrokRequest(prompt, onResponse, onError) {
+  var config = getConfig();
+
+  var request = new XMLHttpRequest();
+  var url = "https://api.x.ai/v1/chat/completions";
+
+  request.onload = function () {
+    if (this.status >= 200 && this.status < 300) {
+      try {
+        var responseBody = JSON.parse(this.responseText);
+        var chatCompletion = responseBody.choices[0].message.content;
+        messages.push({ role: "assistant", content: chatCompletion });
+        
+        // Add model name prefix if enabled
+        if (config.showModelName) {
+          chatCompletion = "Grok: " + chatCompletion;
+        }
+        
+        onResponse(chatCompletion);
+      } catch (e) {
+        onError("Failed to parse response");
+      }
+    } else {
+      try {
+        var errorBody = JSON.parse(this.responseText);
+        onError(errorBody.error ? errorBody.error.message : "Unknown error");
+      } catch (e) {
+        onError("Failed to parse error response");
+      }
+    }
+  };
+
+  request.onerror = function () {
+    onError("Network error");
+  };
+
+  request.open("POST", url);
+  request.setRequestHeader("Content-Type", "application/json");
+  request.setRequestHeader("Authorization", "Bearer " + config.grokApiKey);
+
+  if (messages.length === 0 && config.systemPrompt) {
+    messages.push({ role: "system", content: config.systemPrompt });
+  }
+
+  messages.push({ role: "user", content: prompt });
+
+  var requestBody = {
+    model: "grok-2-latest",
+    messages: messages,
+    temperature: parseFloat(config.temperature) || 1,
+  };
+
+  request.send(JSON.stringify(requestBody));
+}
+
 function resetMessages() {
   messages = [];
 }
@@ -530,7 +613,8 @@ Pebble.addEventListener("webviewclosed", function (e) {
     "11": "confirmTranscription",
     "12": "invertColors",
     "13": "deepseekApiKey",
-    "14": "showModelName"
+    "14": "showModelName",
+    "15": "grokApiKey"
   };
   
   var configValues = {};

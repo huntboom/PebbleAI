@@ -29,7 +29,8 @@
       "confirmTranscription": 11,
       "invertColors": 12,
       "deepseekApiKey": 13,
-      "showModelName": 14
+      "showModelName": 14,
+      "grokApiKey": 15
     },
     "configurable":true, 
     "enableMultiJS": true,
