@@ -34,7 +34,7 @@ var clayConfig = [
       "<li><a href='https://console.anthropic.com/settings/keys'>Claude</a></li>" +
       "<li><a href='https://aistudio.google.com/apikey'>Gemini</a></li>" +
       "<li><a href='https://platform.deepseek.com/api_keys'>DeepSeek</a></li>" +
-      "<li><a href='https://platform.x.ai/'>Grok</a></li>" +
+      "<li><a href='https://console.x.ai/team/69c2fdaa-660d-4ced-ae27-ee80c8bd2e9b/api-keys'>Grok</a></li>" +
       "</ul>",
   },
   {
