@@ -412,7 +412,7 @@ function makeGeminiRequest(prompt, onResponse, onError) {
   }
 
   var request = new XMLHttpRequest();
-  var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+  var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
   request.onload = function () {
     if (this.status >= 200 && this.status < 300) {
