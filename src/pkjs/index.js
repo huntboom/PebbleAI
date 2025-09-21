@@ -152,16 +152,20 @@ var clayConfig = [
       {
         type: "select",
         messageKey: "model",
-        defaultValue: "gpt-3.5-turbo",
+        defaultValue: "gpt-5-nano",
         label: "Model",
         options: [
           {
-            label: "GPT-3.5 Turbo",
-            value: "gpt-3.5-turbo",
+            label: "GPT-5-nano",
+            value: "gpt-5-nano",
           },
           {
             label: "GPT-4",
             value: "gpt-4",
+          },
+	{
+            label: "GPT-3.5-turbo",
+            value: "gpt-3.5-turbo",
           },
         ],
       },
@@ -328,7 +332,7 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
   messages.push({ role: "user", content: prompt });
 
   var requestBody = {
-    model: config.model || "gpt-3.5-turbo",
+    model: config.model || "gpt-5-nano",
     messages: messages,
     temperature: parseFloat(config.temperature) || 1,
   };

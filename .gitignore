@@ -10,3 +10,6 @@ node_modules/
 .env
 #vscode settings:
 .vscode/
+.lock-waf_linux_build 
+.directions.txt.swp
+.directions.txt.swo
