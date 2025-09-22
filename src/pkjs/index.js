@@ -159,10 +159,24 @@ var clayConfig = [
             label: "GPT-5-nano",
             value: "gpt-5-nano",
           },
-          {
-            label: "GPT-4",
-            value: "gpt-4",
+	  {
+            label: "GPT-5-mini",
+            value: "gpt-5-mini",
           },
+	
+          {
+            label: "GPT-4o-mini",
+            value: "gpt-4o-mini",
+          },
+          {
+            label: "GPT-4.1-mini",
+            value: "gpt-4.1-mini",
+          },
+          {
+            label: "GPT-4.1-nano",
+            value: "gpt-4.1-nano",
+          },
+
 	{
             label: "GPT-3.5-turbo",
             value: "gpt-3.5-turbo",
