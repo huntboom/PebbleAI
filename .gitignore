@@ -11,5 +11,12 @@ node_modules/
 #vscode settings:
 .vscode/
 .lock-waf_linux_build 
-.directions.txt.swp
-.directions.txt.swo
+#vim swap files:
+*.swp
+*.swo
+*.swm
+*.swn
+.*.swp
+.*.swo
+.*.swm
+.*.swn
