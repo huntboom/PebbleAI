@@ -1,8 +1,5 @@
 #include <pebble.h>
 
-/** Callback when the select button is pressed (short click). */
-typedef void (*ClickHandler)(void);
-
 void init_ui(ClickHandler on_select_click);
 void cleanup_ui();
 

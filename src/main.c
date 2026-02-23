@@ -16,6 +16,12 @@ static void start_new_prompt() {
   start_transcription(on_transcription);
 }
 
+static void on_select_click(ClickRecognizerRef recognizer, void *context) {
+  (void) recognizer;
+  (void) context;
+  start_new_prompt();
+}
+
 static void on_gpt_response(DictionaryIterator *iter) {
   Tuple *response_tuple = dict_find(iter, AppKeyResponse);
 
@@ -32,7 +38,7 @@ static void on_gpt_response(DictionaryIterator *iter) {
 
 static void init() {
   init_settings();
-  init_ui(start_new_prompt);
+  init_ui(on_select_click);
   init_messages(((MessageHandler[]){on_gpt_response, on_settings_received}));
 
   // On first run, if no API key is set, just show message instead of starting dictation

@@ -8,6 +8,19 @@ function log() {
   }
 }
 
+/** Return a safe string for display; never undefined. APIs use different error shapes. */
+function getErrorMessage(errorBody) {
+  if (!errorBody) return "Unknown error";
+  var e = errorBody.error;
+  if (e) {
+    if (typeof e === "string") return e;
+    if (e.message) return e.message;
+    if (e.code) return e.code;
+  }
+  if (errorBody.message) return errorBody.message;
+  return "Unknown error";
+}
+
 // Configuration keys
 var CONFIG_KEY = "config";
 var API_KEY = "apiKey";
@@ -140,6 +153,18 @@ var clayConfig = [
         type: "input",
         messageKey: "grokApiKey",
         label: "Grok API key",
+      },
+      {
+        type: "select",
+        messageKey: "grokModel",
+        defaultValue: "grok-3-mini",
+        label: "Grok model",
+        options: [
+          { label: "Grok 3 Mini (fast, cheap)", value: "grok-3-mini" },
+          { label: "Grok 3", value: "grok-3" },
+          { label: "Grok 4 Fast (non-reasoning)", value: "grok-4-1-fast-non-reasoning" },
+          { label: "Grok 4 Fast (reasoning)", value: "grok-4-1-fast-reasoning" },
+        ],
       },
     ],
   },
@@ -300,7 +325,7 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
 
       if (responseBody.error) {
         log("OpenAI error:", responseBody.error.message);
-        onError(responseBody.error.message);
+        onError(getErrorMessage(responseBody));
         return;
       }
 
@@ -309,7 +334,7 @@ function makeOpenAIRequest(prompt, onResponse, onError) {
       finishChatResponse(chatCompletion, "OpenAI", config, onResponse);
     } catch (err) {
       log("Failed to parse OpenAI response:", err.message);
-      onError("Failed to parse response: " + err.message);
+      onError("Failed to parse response: " + (err && err.message ? err.message : "unknown"));
     }
   };
 
@@ -367,7 +392,7 @@ function makeClaudeRequest(prompt, onResponse, onError) {
     } else {
       try {
         var errorBody = JSON.parse(this.responseText);
-        onError(errorBody.error ? errorBody.error.message : "Unknown error");
+        onError(getErrorMessage(errorBody));
       } catch (err) {
         onError("Failed to parse error response");
       }
@@ -425,7 +450,7 @@ function makeGeminiRequest(prompt, onResponse, onError) {
     } else {
       try {
         var errorBody = JSON.parse(this.responseText);
-        onError(errorBody.error ? errorBody.error.message : "Unknown error");
+        onError(getErrorMessage(errorBody));
       } catch (err) {
         onError("Failed to parse error response");
       }
@@ -486,7 +511,7 @@ function makeDeepSeekRequest(prompt, onResponse, onError) {
     } else {
       try {
         var errorBody = JSON.parse(this.responseText);
-        onError(errorBody.error ? errorBody.error.message : "Unknown error");
+        onError(getErrorMessage(errorBody));
       } catch (err) {
         onError("Failed to parse error response");
       }
@@ -536,7 +561,7 @@ function makeGrokRequest(prompt, onResponse, onError) {
     } else {
       try {
         var errorBody = JSON.parse(this.responseText);
-        onError(errorBody.error ? errorBody.error.message : "Unknown error");
+        onError(getErrorMessage(errorBody));
       } catch (err) {
         onError("Failed to parse error response");
       }
@@ -558,7 +583,7 @@ function makeGrokRequest(prompt, onResponse, onError) {
   messages.push({ role: "user", content: prompt });
 
   var requestBody = {
-    model: "grok-2-latest",
+    model: config.grokModel || "grok-3-mini",
     messages: messages,
     temperature: parseFloat(config.temperature) || 1,
   };
@@ -581,7 +606,7 @@ Pebble.addEventListener("ready", function (e) {
 var CONFIG_MESSAGE_KEYS = [
   "apiKey", "model", "systemPrompt", "temperature", "vibrate", "apiProvider",
   "claudeApiKey", "geminiApiKey", "confirmTranscription", "invertColors",
-  "deepseekApiKey", "showModelName", "grokApiKey"
+  "deepseekApiKey", "showModelName", "grokApiKey", "grokModel"
 ];
 
 function buildKeyMapping() {
@@ -623,8 +648,9 @@ Pebble.addEventListener("appmessage", function (e) {
   log("Received app message:", JSON.stringify(e.payload));
 
   function onError(errorText) {
-    log("Error occurred:", errorText);
-    Pebble.sendAppMessage({ AppKeyResponse: "Error: " + errorText });
+    var msg = (errorText !== undefined && errorText !== null && String(errorText)) ? String(errorText) : "Unknown error";
+    log("Error occurred:", msg);
+    Pebble.sendAppMessage({ AppKeyResponse: "Error: " + msg });
   }
 
   function onResponse(responseText) {
