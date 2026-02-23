@@ -662,4 +662,12 @@ Pebble.addEventListener("appmessage", function (e) {
     log("Received transcription:", e.payload.AppKeyTranscription);
     makeApiRequest(e.payload.AppKeyTranscription, onResponse, onError);
   }
+
+  var providerFromWatch = e.payload.apiProvider || e.payload[8];
+  if (providerFromWatch) {
+    var config = getConfig();
+    config.apiProvider = providerFromWatch;
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    log("Provider updated from watch:", config.apiProvider);
+  }
 });
