@@ -36,7 +36,8 @@ static void init() {
   init_messages(((MessageHandler[]){on_gpt_response, on_settings_received}));
 
   // On first run, if no API key is set, just show message instead of starting dictation
-  if (!get_settings().apiKeySet && !get_settings().claudeApiKeySet && !get_settings().geminiApiKeySet) {
+  if (!get_settings().apiKeySet && !get_settings().claudeApiKeySet && !get_settings().geminiApiKeySet
+      && !get_settings().deepseekApiKeySet && !get_settings().grokApiKeySet) {
     set_text("Set an API Key in Settings, then restart app");
     return;
   }

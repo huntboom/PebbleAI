@@ -32,5 +32,6 @@ void _init_messages(MessageHandler message_handlers[], int message_handler_count
   inbox_message_handler_count = message_handler_count;
   inbox_message_handlers = message_handlers;
   app_message_register_inbox_received(call_message_handlers);
+  /* Inbound/outbound buffer sizes; increase if long API responses are truncated */
   app_message_open(4096, 4096);
 }

@@ -6,10 +6,12 @@
 // Persistent storage key
 #define SETTINGS_KEY 1
 
+#define SETTINGS_API_PROVIDER_MAX_LEN 16
+
 typedef struct {
   bool vibrate;
   bool apiKeySet;
-  char apiProvider[10];
+  char apiProvider[SETTINGS_API_PROVIDER_MAX_LEN];
   bool claudeApiKeySet;
   bool geminiApiKeySet;
   bool confirmTranscription;

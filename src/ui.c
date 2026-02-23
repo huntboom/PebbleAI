@@ -92,8 +92,8 @@ void set_text(char* text) {
 }
 
 void short_vibe() {
-  static const uint32_t const segments[] = {100};
-  VibePattern pat = {segments, 1};
+  static const uint32_t segments[] = { 100 };
+  VibePattern pat = { segments, 1 };
   vibes_enqueue_custom_pattern(pat);
 }
 

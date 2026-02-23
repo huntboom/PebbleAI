@@ -3,14 +3,16 @@
 #include <settings.h>
 
 static Settings settings = {
-  .vibrate = true, 
+  .vibrate = true,
   .apiKeySet = false,
   .apiProvider = "openai",
   .claudeApiKeySet = false,
   .geminiApiKeySet = false,
   .confirmTranscription = false,
   .invertColors = false,
-  .showModelName = false
+  .deepseekApiKeySet = false,
+  .showModelName = false,
+  .grokApiKeySet = false
 };
 
 void on_settings_received(DictionaryIterator *iter) {
@@ -28,7 +30,8 @@ void on_settings_received(DictionaryIterator *iter) {
 
   Tuple *provider_tuple = dict_find(iter, AppKeyApiProvider);
   if (provider_tuple) {
-    strncpy(settings.apiProvider, provider_tuple->value->cstring, sizeof(settings.apiProvider) - 1);
+    strncpy(settings.apiProvider, provider_tuple->value->cstring, SETTINGS_API_PROVIDER_MAX_LEN - 1);
+    settings.apiProvider[SETTINGS_API_PROVIDER_MAX_LEN - 1] = '\0';
   }
 
   Tuple *claude_api_key_tuple = dict_find(iter, AppKeyClaudeApiKey);
@@ -39,6 +42,16 @@ void on_settings_received(DictionaryIterator *iter) {
   Tuple *gemini_api_key_tuple = dict_find(iter, AppKeyGeminiApiKey);
   if (gemini_api_key_tuple) {
     settings.geminiApiKeySet = strlen(gemini_api_key_tuple->value->cstring) != 0;
+  }
+
+  Tuple *deepseek_api_key_tuple = dict_find(iter, AppKeyDeepseekApiKey);
+  if (deepseek_api_key_tuple) {
+    settings.deepseekApiKeySet = strlen(deepseek_api_key_tuple->value->cstring) != 0;
+  }
+
+  Tuple *grok_api_key_tuple = dict_find(iter, AppKeyGrokApiKey);
+  if (grok_api_key_tuple) {
+    settings.grokApiKeySet = strlen(grok_api_key_tuple->value->cstring) != 0;
   }
 
   Tuple *confirm_transcription_tuple = dict_find(iter, AppKeyConfirmTranscription);

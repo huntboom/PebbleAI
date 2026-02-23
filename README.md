@@ -1,6 +1,6 @@
 # PebbleAI - AI-Powered Voice Assistant for Pebble Time
 
-This project provides an AI-powered voice assistant for the Pebble Time watch. The assistant listens for your voice input, sends the transcriptions to either OpenAI's GPT, Anthropic's Claude, or Google's Gemini API, and displays the AI's response on the watch.
+This project provides an AI-powered voice assistant for the Pebble Time watch. The assistant listens for your voice input, sends the transcriptions to an AI provider (OpenAI, Anthropic Claude, Google Gemini, DeepSeek, or Grok), and displays the response on the watch.
 
 ## Rebble Store
 This app can be installed directly from the [Rebble Store](https://apps.rebble.io/en_US/application/64853961143b6504611fbc06).
@@ -8,7 +8,7 @@ This app can be installed directly from the [Rebble Store](https://apps.rebble.i
 
 ## Getting Started
 
-To use this project, you need to have a Rebble Subscription for the voice transcriptions to work and an API key for your chosen provider (OpenAI, Claude, or Gemini).
+To use this project, you need a Rebble subscription for voice transcription and an API key for your chosen provider (OpenAI, Claude, Gemini, DeepSeek, or Grok).
 
 ### Installation
 
@@ -42,17 +42,24 @@ To use the voice assistant:
 
 ### Configuration
 
-In the app settings, you can configure:
+You can configure the app in two places:
 
-1. API Provider (OpenAI, Claude, or Gemini)
+- **Phone (Pebble app → PebbleAI → Settings):** API provider, API keys, model, system prompt, temperature, vibrate on response, confirm transcription, invert colors, show model name. These are stored on the phone and used for API calls.
+- **Watch (in-app settings menu, long-press Select → Save Settings):** Vibrate, confirm transcription, and invert colors. These are stored on the watch. If you change them on the phone and then on the watch, the watch’s values apply until you save again from the phone.
+
+Settings you can configure (phone or watch as above):
+
+1. API Provider (OpenAI, Claude, Gemini, DeepSeek, or Grok)
 2. API Key for the selected provider
 3. Model selection (for OpenAI)
 4. System prompt (for OpenAI)
 5. Temperature setting
 6. Vibration on response
-7. Light or Dark Theme
+7. Confirm transcription before sending
+8. Light or Dark theme (invert colors)
+9. Display model name at start of messages
 
-Make sure to set up the correct API key for your chosen provider before using the app.
+Make sure to set the correct API key for your chosen provider before using the app.
 
 ## Contributing
 

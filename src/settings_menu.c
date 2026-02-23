@@ -39,6 +39,7 @@ static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex 
             is_selected = current_settings.invertColors;
             break;
         case SETTING_SUBMIT:
+            /* Submit row: label only, no toggle */
             menu_cell_basic_draw(ctx, cell_layer, setting_names[cell_index->row], NULL, NULL);
             return;
     }
