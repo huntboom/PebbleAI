@@ -126,6 +126,16 @@ var clayConfig = [
         messageKey: "geminiApiKey",
         label: "Gemini API key",
       },
+      {
+        type: "select",
+        messageKey: "geminiModel",
+        defaultValue: "gemini-2.5-flash",
+        label: "Gemini model",
+        options: [
+          { label: "Gemini 2.5 Flash (fast)", value: "gemini-2.5-flash" },
+          { label: "Gemini 2.5 Pro", value: "gemini-2.5-pro" },
+        ],
+      },
     ],
   },
   {
@@ -435,7 +445,8 @@ function makeGeminiRequest(prompt, onResponse, onError) {
   }
 
   var request = new XMLHttpRequest();
-  var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+  var geminiModel = config.geminiModel || "gemini-2.5-flash";
+  var url = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent";
 
   request.onload = function () {
     if (this.status >= 200 && this.status < 300) {
@@ -606,7 +617,7 @@ Pebble.addEventListener("ready", function (e) {
 var CONFIG_MESSAGE_KEYS = [
   "apiKey", "model", "systemPrompt", "temperature", "vibrate", "apiProvider",
   "claudeApiKey", "geminiApiKey", "confirmTranscription", "invertColors",
-  "deepseekApiKey", "showModelName", "grokApiKey", "grokModel"
+  "deepseekApiKey", "showModelName", "grokApiKey", "grokModel", "geminiModel"
 ];
 
 function buildKeyMapping() {

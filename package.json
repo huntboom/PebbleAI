@@ -31,7 +31,8 @@
       "deepseekApiKey": 13,
       "showModelName": 14,
       "grokApiKey": 15,
-      "grokModel": 16
+      "grokModel": 16,
+      "geminiModel": 17
     },
     "configurable":true, 
     "enableMultiJS": true,
