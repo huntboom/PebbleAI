@@ -126,6 +126,25 @@ var clayConfig = [
         messageKey: "geminiApiKey",
         label: "Gemini API key",
       },
+      {
+        type: "select",
+        messageKey: "geminiModel",
+        defaultValue: "gemini-3.1-flash-lite",
+        label: "Gemini model",
+        description: "Pick a current model. Choose \u201CCustom\u2026\u201D to type any model ID \u2014 handy when Google retires a model and this list is out of date.",
+        options: [
+          { label: "Gemini 3.1 Flash-Lite (cheapest, recommended)", value: "gemini-3.1-flash-lite" },
+          { label: "Gemini 3.5 Flash (balanced)", value: "gemini-3.5-flash" },
+          { label: "Custom\u2026", value: "custom" },
+        ],
+      },
+      {
+        type: "input",
+        messageKey: "geminiModelCustom",
+        label: "Custom Gemini model ID",
+        description: "Only used when \u201CCustom\u2026\u201D is selected above. Enter the exact model ID, e.g. gemini-3.1-pro.",
+        attributes: { placeholder: "gemini-3.1-flash-lite" },
+      },
     ],
   },
   {
@@ -157,13 +176,12 @@ var clayConfig = [
       {
         type: "select",
         messageKey: "grokModel",
-        defaultValue: "grok-3-mini",
+        defaultValue: "grok-4.3",
         label: "Grok model",
         options: [
-          { label: "Grok 3 Mini (fast, cheap)", value: "grok-3-mini" },
-          { label: "Grok 3", value: "grok-3" },
-          { label: "Grok 4 Fast (non-reasoning)", value: "grok-4-1-fast-non-reasoning" },
-          { label: "Grok 4 Fast (reasoning)", value: "grok-4-1-fast-reasoning" },
+          { label: "Grok 4.3 (recommended)", value: "grok-4.3" },
+          { label: "Grok 4.6 (frontier)", value: "grok-4.6" },
+          { label: "Grok 4.5", value: "grok-4.5" },
         ],
       },
     ],
@@ -278,6 +296,23 @@ var PROVIDER_CONFIG = {
   deepseek: { key: "deepseekApiKey",  fn: makeDeepSeekRequest },
   grok:     { key: "grokApiKey",      fn: makeGrokRequest }
 };
+
+// Resolve which Gemini model to call.
+// `selected` = value of the "geminiModel" select
+// `custom`   = value of the "geminiModelCustom" input
+function resolveGeminiModel(selected, custom) {
+  selected = (selected || "").trim();
+  custom = (custom || "").trim();
+
+  // "Custom…" chosen and an ID was typed → use it verbatim.
+  if (selected === "custom" && custom) return custom;
+
+  // A concrete preset was chosen.
+  if (selected && selected !== "custom") return selected;
+
+  // Nothing set yet (e.g. installs from before this change) → safe current default.
+  return "gemini-3.1-flash-lite";
+}
 
 function makeApiRequest(prompt, onResponse, onError) {
   var config = getConfig();
@@ -434,8 +469,11 @@ function makeGeminiRequest(prompt, onResponse, onError) {
     return;
   }
 
+  var model = resolveGeminiModel(config.geminiModel, config.geminiModelCustom);
   var request = new XMLHttpRequest();
-  var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+  var url = "https://generativelanguage.googleapis.com/v1beta/models/"
+          + encodeURIComponent(model)
+          + ":generateContent?key=" + config.geminiApiKey;
 
   request.onload = function () {
     if (this.status >= 200 && this.status < 300) {
@@ -461,7 +499,7 @@ function makeGeminiRequest(prompt, onResponse, onError) {
     onError("Network error");
   };
 
-  request.open("POST", url + "?key=" + config.geminiApiKey);
+  request.open("POST", url);
   request.setRequestHeader("Content-Type", "application/json");
 
   messages.push({ role: "user", content: prompt });
@@ -552,7 +590,16 @@ function makeGrokRequest(prompt, onResponse, onError) {
     if (this.status >= 200 && this.status < 300) {
       try {
         var responseBody = JSON.parse(this.responseText);
-        var chatCompletion = responseBody.choices[0].message.content;
+        if (responseBody.error) {
+          onError(getErrorMessage(responseBody));
+          return;
+        }
+        var message = responseBody.choices && responseBody.choices[0] && responseBody.choices[0].message;
+        var chatCompletion = message && (message.content || message.reasoning_content);
+        if (!chatCompletion) {
+          onError("Grok returned an empty response");
+          return;
+        }
         messages.push({ role: "assistant", content: chatCompletion });
         finishChatResponse(chatCompletion, "Grok", config, onResponse);
       } catch (err) {
@@ -583,9 +630,10 @@ function makeGrokRequest(prompt, onResponse, onError) {
   messages.push({ role: "user", content: prompt });
 
   var requestBody = {
-    model: config.grokModel || "grok-3-mini",
+    model: config.grokModel || "grok-4.3",
     messages: messages,
     temperature: parseFloat(config.temperature) || 1,
+    max_completion_tokens: 1024
   };
 
   request.send(JSON.stringify(requestBody));
@@ -606,7 +654,8 @@ Pebble.addEventListener("ready", function (e) {
 var CONFIG_MESSAGE_KEYS = [
   "apiKey", "model", "systemPrompt", "temperature", "vibrate", "apiProvider",
   "claudeApiKey", "geminiApiKey", "confirmTranscription", "invertColors",
-  "deepseekApiKey", "showModelName", "grokApiKey", "grokModel"
+  "deepseekApiKey", "showModelName", "grokApiKey", "grokModel",
+  "geminiModel", "geminiModelCustom"
 ];
 
 function buildKeyMapping() {
@@ -658,16 +707,16 @@ Pebble.addEventListener("appmessage", function (e) {
     Pebble.sendAppMessage({ AppKeyResponse: responseText });
   }
 
-  if (e.payload.AppKeyTranscription) {
-    log("Received transcription:", e.payload.AppKeyTranscription);
-    makeApiRequest(e.payload.AppKeyTranscription, onResponse, onError);
-  }
-
-  var providerFromWatch = e.payload.apiProvider || e.payload[8];
+  var providerFromWatch = e.payload.AppKeyApiProvider || e.payload.apiProvider || e.payload[8];
   if (providerFromWatch) {
     var config = getConfig();
     config.apiProvider = providerFromWatch;
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
     log("Provider updated from watch:", config.apiProvider);
+  }
+
+  if (e.payload.AppKeyTranscription) {
+    log("Received transcription:", e.payload.AppKeyTranscription);
+    makeApiRequest(e.payload.AppKeyTranscription, onResponse, onError);
   }
 });
