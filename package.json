@@ -47,7 +47,8 @@
     "targetPlatforms": [
       "diorite",
       "basalt",
-      "chalk"
+      "chalk",
+      "emery"
     ],
     "capabilities": [
       "configurable"
