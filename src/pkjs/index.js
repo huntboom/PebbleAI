@@ -134,7 +134,8 @@ var clayConfig = [
         description: "Pick a current model. Choose \u201CCustom\u2026\u201D to type any model ID \u2014 handy when Google retires a model and this list is out of date.",
         options: [
           { label: "Gemini 3.1 Flash-Lite (cheapest, recommended)", value: "gemini-3.1-flash-lite" },
-          { label: "Gemini 3.5 Flash (balanced)", value: "gemini-3.5-flash" },
+          { label: "Gemini 3.5 Flash-Lite", value: "gemini-3.5-flash-lite" },
+          { label: "Gemini 3.8 Flash (balanced)", value: "gemini-3.8-flash" },
           { label: "Custom\u2026", value: "custom" },
         ],
       },
