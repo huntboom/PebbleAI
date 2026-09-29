@@ -335,10 +335,39 @@ function makeApiRequest(prompt, onResponse, onError) {
   pc.fn(prompt, onResponse, onError);
 }
 
+/** Remove common Markdown marks so the watch shows plain text. */
+function stripMarkdown(text) {
+  if (!text) return text;
+  // Skip work when no common marks exist.
+  if (
+    text.indexOf("*") === -1 &&
+    text.indexOf("#") === -1 &&
+    text.indexOf("`") === -1 &&
+    text.indexOf("[") === -1
+  ) {
+    return text;
+  }
+  var s = text;
+  // Code blocks: keep inner text, drop fences.
+  s = s.replace(/```[^\n]*\n?([\s\S]*?)```/g, "$1");
+  s = s.replace(/`([^`]+)`/g, "$1");
+  // Headers at line start.
+  s = s.replace(/^#{1,6}\s+/gm, "");
+  // Bold then italic (* only; skip _ to protect snake_case).
+  s = s.replace(/\*\*([^*]+)\*\*/g, "$1");
+  s = s.replace(/\*([^*]+)\*/g, "$1");
+  // Links: keep label, drop URL.
+  s = s.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  // List markers at line start.
+  s = s.replace(/^[\t ]*[-*+]\s+/gm, "");
+  s = s.replace(/^[\t ]*\d+\.\s+/gm, "");
+  return s;
+}
+
 function finishChatResponse(content, providerLabel, config, onResponse) {
-  var display = content;
+  var display = stripMarkdown(content);
   if (config && config.showModelName && providerLabel) {
-    display = providerLabel + ": " + content;
+    display = providerLabel + ": " + display;
   }
   onResponse(display);
 }
