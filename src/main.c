@@ -41,6 +41,11 @@ static void init() {
   init_ui(on_select_click);
   init_messages(((MessageHandler[]){on_gpt_response, on_settings_received}));
 
+#if defined(PBL_TOUCH)
+  /* Let MenuLayer screens (settings) scroll and activate by touch. */
+  app_touch_navigation_enable(true);
+#endif
+
   // On first run, if no API key is set, just show message instead of starting dictation
   if (!get_settings().apiKeySet && !get_settings().claudeApiKeySet && !get_settings().geminiApiKeySet
       && !get_settings().deepseekApiKeySet && !get_settings().grokApiKeySet) {
